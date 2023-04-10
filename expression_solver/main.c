@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
         {
             if(opnum!=oprnum-1)
             {
-                fprintf(stderr,"ERROR: Invalid operand count Likey operator without operand\n");
+                fprintf(stderr,"ERROR: Operator Operand count mismatch\n");
                 exit(-1);
             }
             evaluate_postfix();
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
         }
         else if(retval==OPERROR)
         {
-            fprintf(stderr,"ERROR: Invalid operand count Likey operator without operand\n");
+            fprintf(stderr,"ERROR: Operator Operand count mismatch\n");
             exit(-1);
         }
         // print_exp();
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
     {
         if(opnum!=oprnum-1)
         {
-            fprintf(stderr,"ERROR: Invalid operand count Likey operator without operand\n");
+            fprintf(stderr,"ERROR: Operator Operand mismatch\n");
             exit(-1);
         }
         evaluate_postfix();
