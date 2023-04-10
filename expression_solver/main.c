@@ -9,7 +9,9 @@ void stack_operations()
     }
     else if(operator=='*' || operator=='/')
     {
-        while(stack_top!=0 && *(char *)stack[stack_top-1].value=='^')
+        while(stack_top!=0 && (*(char *)stack[stack_top-1].value=='^' || \
+        *(char *)stack[stack_top-1].value=='*' || \
+        *(char *)stack[stack_top-1].value=='/'))
         {
             struct evalue *tmp_val = pop_stack();
             push_exp(tmp_val);
@@ -18,7 +20,7 @@ void stack_operations()
     }
     else if(operator=='+' || operator=='-')
     {
-        while(stack_top!=0 && (*(char *)stack[stack_top-1].value=='^' ||\
+        while(stack_top!=0 && (*(char *)stack[stack_top-1].value=='^' || \
         *(char *)stack[stack_top-1].value=='*' || \
         *(char *)stack[stack_top-1].value=='/'))
         {
@@ -38,45 +40,16 @@ void stack_operations()
     }
 }
 
-int main(int argc, char *argv[])
+void evaluate_postfix()
 {
-    int retval;
-    if(argc>=2)
-    {
-        yyin = fopen(argv[1], "r");
-    }
-    while(retval=yylex())
-    {
-        if(retval==INTEGER)
-        {
-            push_longval_exp(longval);
-        }
-        else if(retval==FLOAT)
-        {
-            push_double_exp(dval);
-        }
-        else if(retval==OPERATOR)
-        {
-            stack_operations();
-        }
-        else if(retval==NEWLINE)
-        {
-            // printf("Newline");
-        }
-        else if(retval==SPACER)
-        {
-            // printf("Spacer");
-        }
-        else if(retval==UNDEF)
-        {
-             
-        }
-        // print_exp();
-    }
-
     while(stack_top!=0)
     {
         struct evalue *tmp_val = pop_stack();
+        if(*((char*)tmp_val->value)=='(')
+        {
+            fprintf(stderr,"ERROR: unclosed paranthesis\n");
+            exit(-1);
+        }
         push_exp(tmp_val);
     }
 
@@ -129,5 +102,75 @@ int main(int argc, char *argv[])
         }
     }
     printf("%lf\n", *(double *)pop_stack()->value);
+    while(exp_top!=0)
+    {
+        pop_exp();
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    int retval;
+    int opnum=0,oprnum=0;
+    if(argc>=2)
+    {
+        yyin = fopen(argv[1], "r");
+    }
+    while(retval=yylex())
+    {
+        if(retval==INTEGER)
+        {
+            oprnum++;
+            push_longval_exp(longval);
+        }
+        else if(retval==FLOAT)
+        {
+            oprnum++;
+            push_double_exp(dval);
+        }
+        else if(retval==OPERATOR)
+        {
+            if(operator!='(' && operator!=')')
+            {
+                opnum++;
+            }
+            stack_operations();
+        }
+        else if(retval==NEWLINE)
+        {
+            if(opnum!=oprnum-1)
+            {
+                fprintf(stderr,"ERROR: Invalid operand count Likey operator without operand\n");
+                exit(-1);
+            }
+            evaluate_postfix();
+            opnum=0;
+            oprnum=0;
+        }
+        else if(retval==SPACER)
+        {
+            // printf("Spacer");
+        }
+        else if(retval==UNDEF)
+        {
+             
+        }
+        else if(retval==OPERROR)
+        {
+            fprintf(stderr,"ERROR: Invalid operand count Likey operator without operand\n");
+            exit(-1);
+        }
+        // print_exp();
+    }
+    
+    if (retval==EFILE)
+    {
+        if(opnum!=oprnum-1)
+        {
+            fprintf(stderr,"ERROR: Invalid operand count Likey operator without operand\n");
+            exit(-1);
+        }
+        evaluate_postfix();
+    }
     fclose(yyin);
 }

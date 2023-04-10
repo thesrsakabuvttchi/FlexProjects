@@ -8,6 +8,7 @@
         INTEGER,
         FLOAT,
         OPERATOR,
+        OPERROR,
         NEWLINE,
         SPACER,
         UNDEF
@@ -34,6 +35,10 @@
 }
 [ \t]* {
     return(SPACER);
+}
+[-\+/*\^]{2}[-\+/*\^]* {
+    sscanf(yytext,"%c",&operator);
+    return(OPERROR);
 }
 <<EOF>> {
     return(EFILE);
