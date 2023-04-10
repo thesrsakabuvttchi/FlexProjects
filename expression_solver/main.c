@@ -153,7 +153,8 @@ int main(int argc, char *argv[])
         }
         else if(retval==UNDEF)
         {
-             
+            fprintf(stderr,"ERROR: symbol %c is undefined\n",operator);
+            exit(-1);             
         }
         else if(retval==OPERROR)
         {

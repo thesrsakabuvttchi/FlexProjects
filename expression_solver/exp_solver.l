@@ -44,6 +44,7 @@
     return(EFILE);
 }
 .   {
-    /*No Action*/
+    sscanf(yytext,"%c",&operator);
+    return(UNDEF);
 }
 %%
